@@ -29,6 +29,8 @@ add_message_files(
   PerceptionObjects.msg
   DockShape.msg
   DockShapes.msg
+  Object.msg
+  Objects.msg
 )
 
 add_service_files(
