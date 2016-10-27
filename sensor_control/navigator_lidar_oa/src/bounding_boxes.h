@@ -5,7 +5,7 @@
 
 class BoundingBox{
 public:
-	static std::vector<objectMessage> get_accurate_objects(const sensor_msgs::PointCloud2ConstPtr &pcloud, 
+	static std::vector<objectMessage> get_accurate_objects(const sensor_msgs::PointCloud2ConstPtr &pcloud,
 														std::vector<objectMessage> objects,
 														Eigen::Affine3d T_enu_velodyne){
 		std::vector<objectMessage> small_objects;
@@ -45,7 +45,7 @@ public:
 					newxmax = x_ > newxmax ? x_ : newxmax;
 					newymax = y_ > newymax ? y_ : newymax;
 					newzmax = z_ > newzmax ? z_ : newzmax;
-				}			
+				}
 			}
 
 			newxmin = newxmin < newxmax ? newxmin : newxmax;
@@ -62,12 +62,12 @@ public:
 				sm_ob.position.x = (newxmax + newxmin)/2;
 				sm_ob.scale.x = fabs(newxmax - newxmin);
 				sm_ob.position.y = (newymax + newymin)/2;
-				sm_ob.scale.y = fabs(newymax - newymin);	
+				sm_ob.scale.y = fabs(newymax - newymin);
 				sm_ob.position.z = (newzmax + newzmin)/2;
 				sm_ob.scale.z = fabs(newzmax - newzmin);
-				small_objects.push_back(sm_ob);	
+				small_objects.push_back(sm_ob);
 
-			}		
+			}
 		}
 		return small_objects;
 	}

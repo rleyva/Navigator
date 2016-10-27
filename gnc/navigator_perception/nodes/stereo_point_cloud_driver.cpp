@@ -2,7 +2,7 @@
  * Author: David Soto
  * Year:   2016
  */
- 
+
 // this node uses a stereo camera rig to generate a point cloud of the environment.
 // It uses the exFAST detector to generate a sparse point cloud.
 // See this for more info: http://www.ra.cs.uni-tuebingen.de/software/sparsestereo/welcome_e.html
@@ -65,7 +65,7 @@ struct XYZRGB{
 
   float x, y, z;
   uint8_t r, g, b;
-  
+
   bool operator==(const XYZRGB &other) const{
     if(this->x == other.x && this->y == other.y && this->z == other.z){
       return true;
@@ -121,7 +121,7 @@ ros::ServiceServer detection_switch;
 
 int main(int argc, char** argv) {
   namespace fs = boost::filesystem;
-  
+
   try {
 
     stringstream log_msg;
@@ -189,7 +189,7 @@ int main(int argc, char** argv) {
 
     // Size adjustment ROI
     /*
-      exFAST is currently heavily optimized for VGA size images, extracting a 
+      exFAST is currently heavily optimized for VGA size images, extracting a
       properly sized region of interest is much more efficient than resizing the image
     */
 
@@ -197,7 +197,7 @@ int main(int argc, char** argv) {
     double uniqueness = 0.8;
     int maxDisp = 70;
     int leftRightStep = 2;
-    
+
     // Feature detection parameters
     double adaptivity = 1.0;
     int minThreshold = 10;
@@ -214,7 +214,7 @@ int main(int argc, char** argv) {
     rectification = new StereoRectification(CalibrationResult(calibration_file_path.c_str()));
 
     // The stereo matcher. SSE Optimized implementation is only available for a 5x5 window
-    SparseStereo<CensusWindow<5>, short> stereo(maxDisp, 1, uniqueness, rectification, 
+    SparseStereo<CensusWindow<5>, short> stereo(maxDisp, 1, uniqueness, rectification,
                                                 false, false, leftRightStep);
 
     // Feature detectors for left and right image
@@ -296,13 +296,13 @@ int main(int argc, char** argv) {
         vector<KeyPoint> keypointsLeft, keypointsRight;
 
         ptime lastTime = microsec_clock::local_time(); // Time algorithm start time
-        
-        // Calculate census transforms for both images and detet features 
+
+        // Calculate census transforms for both images and detet features
         // for both images in parallel
         #pragma omp parallel sections default(shared) num_threads(2)
         {
           #pragma omp section
-          { 
+          {
             ImageConversion::unsignedToSigned(leftImg, &charLeft);
             Census::transform5x5(charLeft, &censusLeft);
             keypointsLeft.clear();
@@ -316,7 +316,7 @@ int main(int argc, char** argv) {
             rightFeatureDetector->detect(rightImg, keypointsRight);
           }
         }
-                
+
         // Stereo matching and reconstruction
         Point2f pt_L;
         Point2f pt_R;
@@ -350,7 +350,7 @@ int main(int argc, char** argv) {
           point.y = X_hom.at<double>(1, 0);
           point.z = X_hom.at<double>(2, 0);
           Vec3b pix_color = raw_left.at<Vec3b>(pt_L);
-          cout << i << "ptL: " << pt_L << " ptR: " << pt_R << " Color: " << pix_color 
+          cout << i << "ptL: " << pt_L << " ptR: " << pt_R << " Color: " << pix_color
             << " " << X_hom.t() << endl;
           point.b = pix_color[0];
           point.g = pix_color[1];
@@ -358,7 +358,7 @@ int main(int argc, char** argv) {
           stereo_point_cloud.push_back(point);
         }
 
-        // Display image 
+        // Display image
         Mat screen = Mat::zeros(Size(leftImg.cols*2, leftImg.rows), CV_8UC3);
         raw_left.copyTo(screen(Rect(Point(0,0), leftImg.size())));
         raw_right.copyTo(screen(Rect(Point(leftImg.cols,0), leftImg.size())));
@@ -484,7 +484,7 @@ void right_image_callback(
 
   // Initialize camera parameters
   static bool first_call = true;
-  if(first_call){   
+  if(first_call){
     right_cam_model.fromCameraInfo(right_most_recent_info);
     right_P = right_cam_model.fullProjectionMatrix();
     right_P(0, 3) = -140;
@@ -497,6 +497,6 @@ void right_image_callback(
 void cloud_callback (const sensor_msgs::PointCloud2ConstPtr& cloud_msg){
      ROS_INFO("velodyne_points callback");
      sensor_msgs::PointCloud2 colored_velodyne_pcd;
-     
+
 }
 
